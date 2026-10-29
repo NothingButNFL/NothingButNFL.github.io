@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#071a33">
+    <meta name="description" content="Nothing But NFL team salary sheets and draft-pick ledgers.">
+    <title>NFL Team Salary Sheet — Nothing But NFL</title>
+    <link rel="icon" href="assets/nothing-but-nfl-logo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="teams.js" defer></script>
+    <script src="front-office.js" defer></script>
+  </head>
+  <body class="team-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="index.html#top" aria-label="Nothing But NFL home">
+        <img class="brand-logo" src="assets/nothing-but-nfl-logo.png" alt="">
+        <span class="brand-copy">NOTHING BUT <strong>NFL</strong></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Expand navigation" aria-expanded="false" aria-controls="primary-nav">
+        <span></span><span></span>
+      </button>
+      <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+        <a href="index.html#overview"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Overview</span></a>
+        <a href="index.html#standings"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Standings</span></a>
+        <div class="teams-menu">
+          <button class="teams-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="teams-dropdown">
+            <span class="nav-icon" aria-hidden="true">◉</span><span class="nav-label">Teams</span><span class="teams-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="teams-dropdown" id="teams-dropdown" aria-label="NFL team salary sheets"></div>
+        </div>
+        <a href="admin.html"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span></a>
+        <a href="index.html#join" class="nav-cta"><span class="nav-icon" aria-hidden="true">＋</span><span class="nav-label">Get involved</span></a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="team-page-intro">
+        <div class="section-wrap">
+          <a class="team-back-link" href="index.html#top"><span aria-hidden="true">←</span> LEAGUE HOME</a>
+          <div class="team-page-title">
+            <span class="team-page-brand">
+              <img id="team-page-logo" class="team-page-logo" src="" alt="" width="68" height="68">
+              <span id="team-page-fallback" class="team-page-fallback" aria-hidden="true" hidden></span>
+            </span>
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> NFL TEAM FRONT OFFICE</p>
+              <h1 id="team-page-name">Team salary sheet</h1>
+              <p class="team-page-subtitle" id="team-page-subtitle">A local working sheet for your franchise.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="front-office-section" id="front-office" aria-labelledby="front-office-title">
+        <div class="section-wrap">
+          <div class="section-heading-row front-office-heading">
+            <div>
+              <div class="section-kicker"><span>01</span> THE FRONT OFFICE</div>
+              <h2 id="front-office-title"><span id="team-heading-name">Team</span> Rosters &amp; Salaries</h2>
+              <p class="section-subtitle">Update player cap hits, track your cap room, and manage the picks your team owns.</p>
+            </div>
+            <span class="data-mode"><i aria-hidden="true"></i> LOCAL TO THIS BROWSER</span>
+          </div>
+
+          <div class="workspace-toolbar">
+            <div class="franchise-picker">
+              <span>TEAM SALARY SHEET</span>
+              <strong class="selected-team-name" id="selected-team-name"></strong>
+            </div>
+            <div class="data-actions">
+              <button class="workspace-button" id="export-data" type="button">Export backup <span aria-hidden="true">↓</span></button>
+              <label class="workspace-button import-button" for="import-data">Import backup <span aria-hidden="true">↑</span></label>
+              <input id="import-data" type="file" accept="application/json,.json" hidden>
+              <button class="workspace-button reset-button" id="reset-data" type="button">Reset local data</button>
+            </div>
+          </div>
+          <p class="storage-notice" id="storage-notice" role="status">Edits are saved in this browser only. This workspace has no league sync or live NFL data.</p>
+          <p class="workspace-status" id="workspace-status" role="status" aria-live="polite"></p>
+
+          <div class="season-tabs" id="season-tabs" role="tablist" aria-label="Contract season"></div>
+          <div id="salary-year-content">
+          <div class="cap-overview" aria-label="Selected team season salary overview">
+            <article class="cap-stat"><span>DEAD CAP · <span id="dead-cap-card-year">2026</span></span><strong id="dead-cap-card-total">$0</strong><small>Recorded for this salary year</small></article>
+            <article class="cap-stat"><span>BASE SALARY CAP</span><strong id="base-cap-value">Not set</strong><small>Shared league-wide base · <a href="admin.html">Set in Admin</a></small></article>
+            <article class="cap-stat"><span>CAP ROLLOVER</span><strong id="cap-rollover">$0</strong><small>Previous season's remaining cap</small></article>
+            <article class="cap-stat adjustment-stat"><span>MANUAL ADJUSTMENT</span><label class="cap-limit-input" for="cap-adjustment"><span aria-hidden="true">±</span><input id="cap-adjustment" type="text" inputmode="decimal" maxlength="14" value="$0" aria-label="Manual cap space adjustment in dollars" data-currency="true" data-allow-negative="true"></label><small>Fines, rewards, or league corrections</small></article>
+            <article class="cap-stat"><span>TOTAL CAP SPACE</span><strong id="total-cap-space">Not set</strong><small>Base cap + rollover + adjustment</small></article>
+            <article class="cap-stat cap-room-stat"><span>REMAINING CAP ROOM</span><strong id="cap-room">Not set</strong><small>Total cap space minus season cap hit and dead cap</small></article>
+            <article class="cap-stat"><span>OWNED DRAFT PICKS</span><strong id="owned-pick-count">0</strong><small>Assets assigned to this team</small></article>
+          </div>
+
+          <div class="management-panel">
+            <div class="panel-heading">
+              <div><span class="panel-index" id="salary-panel-index">01 / CONTRACTS</span><h3><span id="salary-season-heading">2026</span> Salaries</h3></div>
+              <p>Years remaining counts this and future seasons with a base salary over $0. On the current league year's sheet, penalties auto-calculate: March 1–May 31 includes current and future prorated bonuses (plus guaranteed salary for releases); June 1–February 28 shows only current-year penalties here, with future amounts added to next year's dead-cap ledger when traded or released.</p>
+            </div>
+            <details class="salary-import-panel" id="salary-import-panel">
+              <summary>Paste spreadsheet rows <span>Import to <strong id="salary-import-season">2026</strong></span></summary>
+              <label for="salary-paste-input">Copy and paste player rows from your spreadsheet</label>
+              <textarea id="salary-paste-input" rows="5" spellcheck="false" placeholder="Player Name&#9;POS&#9;Roster Type&#9;Base Salary&#9;Prorated Bonus&#9;Roster Bonus&#9;GTD Salary&#9;Cap Hit&#9;Cap %&#9;Base Paid&#9;Years Left&#9;Trade Penalty&#9;Net Savings&#9;Release Penalty&#9;Net Savings"></textarea>
+              <p>Paste rows with their header row for the most reliable column matching. Without headers, include Player Name, Position, Roster Type, and the four salary columns first, followed by Years Left and the four Trade/Release values; calculated columns such as Cap Hit, Cap %, and Base Paid may be included or omitted. Cap Hit, Cap %, Years Remaining, and current-year penalties are calculated automatically. Players are added or updated only for this season; import them separately for any other season.</p>
+              <button class="button button-lime" id="import-salary-paste" type="button">Import to <span id="salary-import-button-season">2026</span></button>
+            </details>
+            <form class="management-form salary-form" id="add-player-form">
+              <label>Player name<input name="name" required maxlength="70" placeholder="e.g. Player name"></label>
+              <label>Position<input name="position" required maxlength="8" placeholder="e.g. QB"></label>
+              <label>Roster type<input name="rosterType" required maxlength="30" placeholder="e.g. Active"></label>
+              <button class="button button-lime add-button" type="submit">Add player <span aria-hidden="true">+</span></button>
+            </form>
+            <div class="management-table-wrap">
+              <table class="management-table salary-table">
+                <colgroup>
+                  <col class="salary-col-player"><col class="salary-col-position"><col class="salary-col-roster">
+                  <col class="salary-col-base"><col class="salary-col-prorated"><col class="salary-col-roster-bonus">
+                  <col class="salary-col-guaranteed"><col class="salary-col-hit"><col class="salary-col-percent">
+                  <col class="salary-col-years"><col class="salary-col-trade-penalty"><col class="salary-col-trade-savings">
+                  <col class="salary-col-release-penalty"><col class="salary-col-release-savings"><col class="salary-col-actions">
+                </colgroup>
+                <thead>
+                  <tr class="salary-groups">
+                    <th scope="colgroup" colspan="10">CONTRACT INFORMATION</th>
+                    <th scope="colgroup" colspan="2">TRADE</th>
+                    <th scope="colgroup" colspan="2">RELEASE</th>
+                    <th rowspan="2"><span class="sr-only">Actions</span></th>
+                  </tr>
+                  <tr>
+                    <th scope="col">PLAYER NAME</th><th scope="col">POSITION</th><th scope="col">ROSTER TYPE</th>
+                    <th scope="col">BASE SALARY</th><th scope="col">PRORATED BONUS</th><th scope="col">ROSTER BONUS</th>
+                    <th scope="col">GUARANTEED SALARY</th><th scope="col">CAP HIT</th><th scope="col">CAP %</th>
+                    <th scope="col">YEARS REMAINING</th><th scope="col">TRADE PENALTY</th><th scope="col">TRADE NET SAVINGS</th>
+                    <th scope="col">RELEASE PENALTY</th><th scope="col">RELEASE NET SAVINGS</th><th scope="col"><span class="sr-only">Actions</span></th>
+                  </tr>
+                </thead>
+                <tbody id="salary-rows"></tbody>
+              </table>
+            </div>
+            <p class="empty-state" id="salary-empty">No players on this salary sheet yet. Add a player below.</p>
+          </div>
+
+          <div class="management-panel picks-panel">
+            <div class="panel-heading">
+              <div><span class="panel-index">02 / CONTRACT MOVES</span><h3><span id="dead-cap-ledger-year">2026</span> Dead Cap</h3></div>
+              <p>Dead-cap entries shown here follow the selected salary-year tab. Trade or release a player from the current sheet to record dead cap. Tracking is available for the first two salary years.</p>
+            </div>
+            <details class="salary-import-panel dead-cap-import-panel">
+              <summary>Paste dead-cap spreadsheet rows</summary>
+              <label for="dead-cap-paste-input">Copy and paste Player Name, Position, and Cap Hit columns</label>
+              <textarea id="dead-cap-paste-input" rows="4" spellcheck="false" placeholder="Player Name&#9;Position&#9;Cap Hit&#10;Player name&#9;QB&#9;$5,000,000"></textarea>
+              <p>Paste a header row followed by data, or paste headerless rows in Player Name, Position, Cap Hit order. Imported rows are added to the selected year's ledger.</p>
+              <button class="button button-lime" id="import-dead-cap-paste" type="button">Import to <span id="dead-cap-ledger-year-button">2026</span></button>
+            </details>
+            <div class="management-table-wrap">
+              <table class="management-table dead-cap-table">
+                <thead><tr><th scope="col">TRANSACTION</th><th scope="col">PLAYER</th><th scope="col">POSITION</th><th scope="col">TRANSACTION YEAR</th><th scope="col">DEAD CAP</th><th scope="col">DATE RECORDED</th><th scope="col"><span class="sr-only">ACTIONS</span></th></tr></thead>
+                <tbody id="dead-cap-rows"></tbody>
+              </table>
+            </div>
+            <p class="empty-state" id="dead-cap-empty">No trade or release dead cap recorded for this table year.</p>
+          </div>
+
+          </div>
+
+          <div class="management-panel picks-panel" id="draft-picks-panel" role="tabpanel" aria-labelledby="season-tab-draft-picks" hidden>
+            <div class="panel-heading">
+              <div><span class="panel-index">03 / DRAFT CAPITAL</span><h3>Owned draft picks</h3></div>
+              <p>Record a pick, then change its owner to reflect a trade.</p>
+            </div>
+            <div class="management-table-wrap">
+              <table class="management-table picks-table">
+                <thead><tr><th scope="col">DRAFT YEAR</th><th scope="col">ROUND</th><th scope="col">ORIGINAL FRANCHISE</th><th scope="col">CURRENT OWNER</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                <tbody id="pick-rows"></tbody>
+              </table>
+            </div>
+            <p class="empty-state" id="picks-empty">No draft picks recorded for this team. Add a pick or import a backup.</p>
+            <form class="management-form pick-form" id="add-pick-form">
+              <label>Draft year<input name="year" type="number" required min="2000" max="2100" step="1"></label>
+              <label>Round<input name="round" type="number" required min="1" max="20" step="1" placeholder="1"></label>
+              <label>Original franchise<select name="originalTeam" required></select></label>
+              <button class="button button-lime add-button" type="submit">Add owned pick <span aria-hidden="true">+</span></button>
+            </form>
+          </div>
+          <p class="workspace-footnote">Cap and pick records start blank. Enter your league's figures; no salaries, cap limits, or NFL transactions are preloaded as official data.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="index.html#top" aria-label="Nothing But NFL home">
+        <img class="brand-logo" src="assets/nothing-but-nfl-logo.png" alt="">
+        <span class="brand-copy">NOTHING BUT <strong>NFL</strong></span>
+      </a>
+      <p>Built for the love of the game—and the people behind it.</p>
+      <a class="back-top" href="#main">BACK TO TOP <span aria-hidden="true">↑</span></a>
+      <span class="footer-note">COMMUNITY-LED · SAMPLE LEAGUE CONCEPT</span>
+    </footer>
+  </body>
+</html>
