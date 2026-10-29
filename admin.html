@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#071a33">
+    <meta name="description" content="Manage Nothing But NFL league-wide salary cap settings.">
+    <title>League Cap Directory — Nothing But NFL</title>
+    <link rel="icon" href="assets/nothing-but-nfl-logo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="teams.js" defer></script>
+    <script src="admin.js" defer></script>
+  </head>
+  <body class="admin-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="index.html#top" aria-label="Nothing But NFL home">
+        <img class="brand-logo" src="assets/nothing-but-nfl-logo.png" alt="">
+        <span class="brand-copy">NOTHING BUT <strong>NFL</strong></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Expand navigation" aria-expanded="false" aria-controls="primary-nav">
+        <span></span><span></span>
+      </button>
+      <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+        <a href="index.html#overview"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Overview</span></a>
+        <a href="index.html#standings"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Standings</span></a>
+        <div class="teams-menu">
+          <button class="teams-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="teams-dropdown">
+            <span class="nav-icon" aria-hidden="true">◉</span><span class="nav-label">Teams</span><span class="teams-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="teams-dropdown" id="teams-dropdown" aria-label="NFL team salary sheets"></div>
+        </div>
+        <div class="admin-menu">
+          <button class="admin-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-dropdown">
+            <span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span><span class="admin-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="admin-dropdown" id="admin-dropdown" aria-label="Admin pages">
+            <a class="admin-menu-link" href="admin.html" role="menuitem" aria-current="page"><span>League Cap Directory</span></a>
+          </div>
+        </div>
+        <a href="index.html#join" class="nav-cta"><span class="nav-icon" aria-hidden="true">＋</span><span class="nav-label">Get involved</span></a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="team-page-intro admin-page-intro">
+        <div class="section-wrap">
+          <a class="team-back-link" href="index.html#top"><span aria-hidden="true">←</span> LEAGUE HOME</a>
+          <div class="team-page-title">
+            <div>
+              <p class="eyebrow"><span class="eyebrow-dot"></span> LEAGUE-WIDE SETTINGS</p>
+              <h1>League Cap Directory</h1>
+              <p class="team-page-subtitle">Set the shared base salary cap for each contract season.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="front-office-section admin-section" aria-labelledby="admin-title">
+        <div class="section-wrap">
+          <div class="section-heading-row front-office-heading">
+            <div>
+              <div class="section-kicker"><span>01</span> COMMISSIONER SETTINGS</div>
+              <h2 id="admin-title">League cap <span>settings.</span></h2>
+              <p class="section-subtitle">These base caps are shared across all 32 team sheets. Changes are saved in this browser and reflected on each team's cap overview.</p>
+            </div>
+            <span class="data-mode"><i aria-hidden="true"></i> LOCAL TO THIS BROWSER</span>
+          </div>
+
+          <p class="storage-notice" id="admin-storage-notice" role="status">Edits are saved in this browser only. This workspace has no league sync or live NFL data.</p>
+          <p class="workspace-status" id="admin-status" role="status" aria-live="polite"></p>
+
+          <div class="management-panel admin-cap-panel">
+            <div class="panel-heading">
+              <div><span class="panel-index">2026 — 2033</span><h3>Base salary caps</h3></div>
+              <p>Enter each season's league-wide cap in USD. Team adjustments and rollover stay on their individual salary sheets.</p>
+            </div>
+            <div class="management-table-wrap">
+              <table class="management-table admin-cap-table">
+                <thead><tr><th scope="col">SEASON</th><th scope="col">LEAGUE-WIDE BASE SALARY CAP (USD)</th></tr></thead>
+                <tbody id="admin-cap-rows"></tbody>
+              </table>
+            </div>
+            <p class="workspace-footnote">Leave a field blank when the base cap has not been set. Team cap space is calculated from this value, that team's adjustment, prior-year rollover, and roster cap hits.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="index.html#top" aria-label="Nothing But NFL home">
+        <img class="brand-logo" src="assets/nothing-but-nfl-logo.png" alt="">
+        <span class="brand-copy">NOTHING BUT <strong>NFL</strong></span>
+      </a>
+      <p>Built for the love of the game—and the people behind it.</p>
+      <a class="back-top" href="#main">BACK TO TOP <span aria-hidden="true">↑</span></a>
+      <span class="footer-note">COMMUNITY-LED · SAMPLE LEAGUE CONCEPT</span>
+    </footer>
+  </body>
+</html>

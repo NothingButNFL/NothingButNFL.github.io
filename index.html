@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#071a33">
+    <meta name="description" content="Nothing But NFL — a community-built football general manager role-playing league. Explore teams and prepare to join the front office.">
+    <title>Nothing But NFL — General Manager League</title>
+    <link rel="icon" href="assets/nothing-but-nfl-logo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="teams.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Nothing But NFL home">
+        <img class="brand-logo" src="assets/nothing-but-nfl-logo.png" alt="">
+        <span class="brand-copy">NOTHING BUT <strong>NFL</strong></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Expand navigation" aria-expanded="false" aria-controls="primary-nav">
+        <span></span><span></span>
+      </button>
+      <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
+        <a href="#overview"><span class="nav-icon" aria-hidden="true">⌂</span><span class="nav-label">Overview</span></a>
+        <a href="#standings"><span class="nav-icon" aria-hidden="true">▤</span><span class="nav-label">Standings</span></a>
+        <div class="teams-menu">
+          <button class="teams-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="teams-dropdown">
+            <span class="nav-icon" aria-hidden="true">◉</span><span class="nav-label">Teams</span><span class="teams-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="teams-dropdown" id="teams-dropdown" aria-label="NFL team salary sheets"></div>
+        </div>
+        <div class="admin-menu">
+          <button class="admin-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-dropdown">
+            <span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span><span class="admin-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="admin-dropdown" id="admin-dropdown" aria-label="Admin pages">
+            <a class="admin-menu-link" href="admin.html" role="menuitem"><span>League Cap Directory</span></a>
+          </div>
+        </div>
+        <a href="#join" class="nav-cta"><span class="nav-icon" aria-hidden="true">＋</span><span class="nav-label">Get involved</span></a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> A football GM role-playing league</p>
+          <h1 id="hero-title">Build the team.<br><span>Own the legacy.</span></h1>
+          <p class="hero-intro">The game is bigger than Sunday. Make the calls, shape your roster, and compete alongside a community of football minds.</p>
+          <div class="hero-actions">
+            <a class="button button-lime" href="#standings">View the standings <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#join">How to get involved <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-proof" aria-label="League format">
+            <div><strong>01</strong><span>One front office<br>at a time</span></div>
+            <div><strong>02</strong><span>Built around<br>the community</span></div>
+            <div><strong>03</strong><span>Your decisions<br>set the direction</span></div>
+          </div>
+        </div>
+        <div class="hero-visual" aria-label="Illustration of a football playbook">
+          <div class="field-lines" aria-hidden="true">
+            <span class="yard yard-one"></span><span class="yard yard-two"></span><span class="yard yard-three"></span>
+            <span class="route route-one"></span><span class="route route-two"></span>
+            <span class="route-dot dot-one"></span><span class="route-dot dot-two"></span>
+            <span class="football"><span></span></span>
+          </div>
+          <div class="snapshot-card">
+            <div class="snapshot-heading"><span>THE FRONT OFFICE</span><span class="snapshot-icon" aria-hidden="true">✳</span></div>
+            <p>Every call<br>changes the game.</p>
+            <div class="snapshot-footer"><span>GM MODE</span><span>ON <i aria-hidden="true"></i></span></div>
+          </div>
+          <span class="visual-caption">YOUR FRANCHISE. YOUR CALL.</span>
+          <span class="hero-number" aria-hidden="true">01</span>
+        </div>
+        <div class="hero-bottom">
+          <span>NOTHING BUT NFL LEAGUE</span>
+          <a href="#standings">SCROLL TO EXPLORE <span aria-hidden="true">↓</span></a>
+          <span>COMMUNITY FIRST <i aria-hidden="true">✳</i></span>
+        </div>
+      </section>
+
+      <section id="overview" aria-label="Overview"></section>
+
+      <section class="standings-section" id="standings" aria-labelledby="standings-title">
+        <div class="section-wrap">
+          <div class="section-kicker light-kicker"><span>01</span> THE SCOREBOARD</div>
+          <div class="section-heading-row">
+            <div>
+              <h2 id="standings-title">League <span>picture.</span></h2>
+              <p class="section-subtitle">A quick look at how the league is laid out.</p>
+            </div>
+            <span class="sample-label"><i aria-hidden="true"></i> SAMPLE DATA — NOT LIVE</span>
+          </div>
+          <div class="standings-toolbar">
+            <div class="tab-list" role="tablist" aria-label="Standings conference">
+              <button class="tab-button is-active" id="tab-east" role="tab" aria-selected="true" aria-controls="standings-panel" data-conference="East">Eastern Conference</button>
+              <button class="tab-button" id="tab-west" role="tab" aria-selected="false" aria-controls="standings-panel" data-conference="West" tabindex="-1">Western Conference</button>
+            </div>
+            <span class="standings-note">Illustrative records for this website concept</span>
+          </div>
+          <div class="standings-panel" id="standings-panel" role="tabpanel" aria-labelledby="tab-east" tabindex="0">
+            <div class="standings-table-wrap">
+              <table class="standings-table">
+                <thead><tr><th scope="col">#</th><th scope="col">FRANCHISE</th><th scope="col">W</th><th scope="col">L</th><th scope="col">T</th><th scope="col">PCT</th><th scope="col">STREAK</th></tr></thead>
+                <tbody id="standings-body"></tbody>
+              </table>
+            </div>
+            <div class="table-footnote"><span><i class="legend-dot"></i> Playoff position shown for illustration only</span><span id="conference-caption">EASTERN CONFERENCE · SAMPLE</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="join-section" id="join" aria-labelledby="join-title">
+        <div class="section-wrap join-grid">
+          <div class="join-copy">
+            <div class="section-kicker light-kicker"><span>02</span> YOUR NEXT MOVE</div>
+            <h2 id="join-title">Ready for<br>the <span>front office?</span></h2>
+            <p>Tell us what kind of GM you'd be. Prepare a short introduction, then share it with the league commissioner through your community's usual channel.</p>
+            <div class="join-callout"><span aria-hidden="true">↗</span><span><strong>New to the league?</strong><br>No playbook required—just a love of football and a point of view.</span></div>
+          </div>
+          <form class="interest-form" id="interest-form">
+            <div class="form-heading"><span>GM INTEREST NOTE</span><span>01 — 03</span></div>
+            <label for="applicant-name">Your name or handle</label>
+            <input id="applicant-name" name="name" type="text" placeholder="How should we address you?" required maxlength="70">
+            <label for="applicant-team">What interests you most?</label>
+            <select id="applicant-team" name="interest" required>
+              <option value="" selected disabled>Choose an area</option>
+              <option>Building a roster</option>
+              <option>League strategy</option>
+              <option>Community role-play</option>
+              <option>I'm open to anything</option>
+            </select>
+            <label for="applicant-note">A little about your GM style <span>(optional)</span></label>
+            <textarea id="applicant-note" name="note" rows="3" maxlength="240" placeholder="What's your approach to building a team?"></textarea>
+            <button class="button button-lime form-submit" type="submit">Prepare my introduction <span aria-hidden="true">↗</span></button>
+            <p class="form-privacy">This demo doesn't send or store your details. It creates a message you can copy and share yourself.</p>
+            <div class="application-result" id="application-result" aria-live="polite" hidden>
+              <label for="application-message">Your ready-to-share introduction</label>
+              <textarea id="application-message" rows="5" readonly></textarea>
+              <button class="copy-button" id="copy-application" type="button">Copy introduction <span aria-hidden="true">⧉</span></button>
+              <p class="copy-status" id="copy-status" aria-live="polite"></p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="#top" aria-label="Nothing But NFL home">
+        <img class="brand-logo" src="assets/nothing-but-nfl-logo.png" alt="">
+        <span class="brand-copy">NOTHING BUT <strong>NFL</strong></span>
+      </a>
+      <p>Built for the love of the game—and the people behind it.</p>
+      <a class="back-top" href="#top">BACK TO TOP <span aria-hidden="true">↑</span></a>
+      <span class="footer-note">COMMUNITY-LED · SAMPLE LEAGUE CONCEPT</span>
+    </footer>
+
+  </body>
+</html>
