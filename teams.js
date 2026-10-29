@@ -69,6 +69,9 @@ if (teamsDropdown) {
 
 const teamsMenu = document.querySelector(".teams-menu");
 const teamsTrigger = document.querySelector(".teams-trigger");
+const adminMenu = document.querySelector(".admin-menu");
+const adminTrigger = document.querySelector(".admin-trigger");
+const adminDropdown = document.querySelector("#admin-dropdown");
 const mobileMenuToggle = document.querySelector(".menu-toggle");
 const siteNavigation = document.querySelector("#primary-nav");
 
@@ -104,6 +107,38 @@ if (teamsMenu && teamsTrigger) {
   });
 }
 
+function closeAdminMenu() {
+  if (!adminMenu || !adminTrigger) return;
+  adminMenu.classList.remove("is-open");
+  adminTrigger.setAttribute("aria-expanded", "false");
+}
+
+if (adminMenu && adminTrigger && adminDropdown) {
+  adminTrigger.addEventListener("click", () => {
+    const open = adminTrigger.getAttribute("aria-expanded") === "true";
+    adminTrigger.setAttribute("aria-expanded", String(!open));
+    adminMenu.classList.toggle("is-open", !open);
+  });
+  adminDropdown.setAttribute("role", "menu");
+  adminTrigger.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      adminTrigger.setAttribute("aria-expanded", "true");
+      adminMenu.classList.add("is-open");
+      adminDropdown.querySelector("a")?.focus();
+    }
+  });
+  adminMenu.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeAdminMenu();
+      adminTrigger.focus();
+    }
+  });
+  document.addEventListener("click", (event) => {
+    if (!adminMenu.contains(event.target)) closeAdminMenu();
+  });
+}
+
 if (mobileMenuToggle && siteNavigation) {
   mobileMenuToggle.addEventListener("click", () => {
     const isExpanded = mobileMenuToggle.getAttribute("aria-expanded") === "true";
@@ -117,6 +152,7 @@ if (mobileMenuToggle && siteNavigation) {
       mobileMenuToggle.setAttribute("aria-label", "Expand navigation");
       document.querySelector(".site-header")?.classList.remove("is-open");
       closeTeamsMenu();
+      closeAdminMenu();
     }
   });
 }

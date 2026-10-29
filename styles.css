@@ -36,7 +36,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .brand-copy strong { color: var(--lime); font-weight: 500; }
 .primary-nav { display: flex; width: 100%; flex-direction: column; align-items: stretch; gap: 5px; font-size: 13px; color: #fff; }
 .primary-nav > a:not(.nav-cta):hover, .primary-nav > a:not(.nav-cta):focus-visible { color: #fff; background: #174477; }
-.primary-nav > a:not(.nav-cta), .teams-trigger { display: flex; min-height: 40px; align-items: center; gap: 13px; padding: 0 10px; border: 0; border-radius: 2px; color: #fff; font-size: 13px; }
+.primary-nav > a:not(.nav-cta), .teams-trigger, .admin-trigger { display: flex; min-height: 40px; align-items: center; gap: 13px; padding: 0 10px; border: 0; border-radius: 2px; color: #fff; font-size: 13px; }
 .primary-nav .nav-cta { display: flex; min-height: 42px; align-items: center; gap: 13px; padding: 0 10px; border: 1px solid rgba(255,255,255,.55); background: transparent; color: #fff; font-weight: 700; }
 .nav-cta span { font-size: 16px; }
 .menu-toggle { display: flex; width: 40px; height: 40px; flex: 0 0 40px; flex-direction: column; align-items: center; justify-content: center; gap: 5px; margin: 0 auto; border: 1px solid #31527a; background: transparent; cursor: pointer; }
@@ -52,12 +52,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .site-header:hover .brand-logo, .site-header:focus-within .brand-logo, .site-header.is-open .brand-logo { width: 36px; height: 36px; flex-basis: 36px; }
 .nav-icon { display: inline-flex; width: 20px; flex: 0 0 20px; align-items: center; justify-content: center; color: #fff; font-size: 18px; line-height: 1; }
 .teams-menu { position: relative; display: flex; width: 100%; flex-direction: column; align-items: stretch; }
-.teams-trigger { justify-content: flex-start; background: transparent; cursor: pointer; }
+.admin-menu { position: relative; display: flex; width: 100%; flex-direction: column; align-items: stretch; }
+.teams-trigger, .admin-trigger { justify-content: flex-start; background: transparent; cursor: pointer; }
 .teams-trigger:hover, .teams-menu.is-open .teams-trigger, .teams-menu:focus-within .teams-trigger { color: #fff; background: #174477; }
+.admin-trigger:hover, .admin-menu.is-open .admin-trigger, .admin-menu:focus-within .admin-trigger { color: #fff; background: #174477; }
 .teams-chevron { margin-left: auto; color: #fff; font-size: 18px; transition: transform .18s ease; }
+.admin-chevron { margin-left: auto; color: #fff; font-size: 18px; transition: transform .18s ease; }
 .teams-menu.is-open .teams-chevron { transform: rotate(90deg); }
+.admin-menu.is-open .admin-chevron { transform: rotate(90deg); }
 .teams-dropdown { position: fixed; top: 126px; left: calc(var(--sidebar-open-width) + 10px); z-index: 35; display: grid; width: min(440px, calc(100vw - var(--sidebar-open-width) - 30px)); max-height: min(440px, calc(100vh - 36px)); grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px 4px; overflow-y: auto; padding: 8px; border: 1px solid #31527a; background: #0c2b50; box-shadow: 0 16px 36px rgba(0,0,0,.28); opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .16s ease, transform .16s ease; }
 .teams-menu:hover .teams-dropdown, .teams-menu:focus-within .teams-dropdown, .teams-menu.is-open .teams-dropdown { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.admin-dropdown { display: none; width: 100%; gap: 2px; padding: 7px 0; border-bottom: 1px solid #334149; background: #101a22; }
+.admin-menu.is-open .admin-dropdown { display: grid; }
+.admin-menu-link { display: flex; min-height: 36px; align-items: center; padding: 5px 9px 5px 43px; color: #fff; font-size: 11px; }
+.admin-menu-link:hover, .admin-menu-link:focus-visible, .admin-menu-link[aria-current="page"] { background: #174477; color: #fff; }
 .team-menu-link { display: grid; min-width: 0; min-height: 31px; grid-template-columns: 22px minmax(0, 1fr); align-items: center; gap: 6px; padding: 3px 5px; color: #fff; font-size: 9px; transition: background .12s ease; }
 .team-menu-link:hover, .team-menu-link:focus-visible { background: #174477; color: #fff; }
 .team-menu-logo { position: relative; display: grid; width: 22px; height: 22px; place-items: center; overflow: hidden; background: transparent; }
@@ -473,12 +481,15 @@ body > main, body > footer { margin-left: 58px; }
   .site-header .brand-mark { width: 27px; height: 27px; }
   .primary-nav { position: static; top: auto; right: auto; left: auto; display: flex; width: 100%; height: auto; flex-direction: column; align-items: stretch; gap: 5px; padding: 0; background: transparent; }
   .primary-nav.is-open { display: flex; }
-  .primary-nav > a:not(.nav-cta), .teams-trigger { min-height: 40px; padding: 0 7px; border-bottom: 0; }
+  .primary-nav > a:not(.nav-cta), .teams-trigger, .admin-trigger { min-height: 40px; padding: 0 7px; border-bottom: 0; }
   .primary-nav .nav-cta { justify-content: flex-start; margin-top: 0; padding: 0 7px; }
   .teams-menu { min-height: 0; }
+  .admin-menu { min-height: 0; }
   .teams-trigger { justify-content: flex-start; border-bottom: 0; }
+  .admin-trigger { justify-content: flex-start; border-bottom: 0; }
   .teams-dropdown, .primary-nav .teams-menu .teams-dropdown { position: fixed; top: 100px; left: 58px; display: grid; width: min(330px, calc(100vw - 66px)); max-height: min(65vh, 500px); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 7px; border: 1px solid #31527a; background: #0c2b50; box-shadow: 0 16px 36px rgba(0,0,0,.3); opacity: 0; pointer-events: none; transform: translateY(6px); }
   .primary-nav .teams-menu.is-open .teams-dropdown { display: grid; opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .admin-menu-link { min-height: 40px; padding: 7px 7px 7px 33px; border-bottom: 1px solid #334149; }
   .team-menu-link { min-height: 32px; grid-template-columns: 22px minmax(0,1fr); gap: 5px; padding: 3px; font-size: 8px; }
   .team-menu-logo { width: 21px; height: 21px; }
   body > main, body > footer { margin-left: 50px; }
@@ -563,4 +574,42 @@ body > main, body > footer { margin-left: 58px; }
 
 @media (max-width: 620px) {
   .salary-table tbody { grid-template-columns: 1fr; }
+}
+
+.trade-panel[hidden] { display: none; }
+.trade-partners { display: grid; max-width: 680px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.trade-partners label { display: grid; gap: 6px; color: #fff; font: 9px var(--mono); }
+.trade-partners label span { color: #c5d5e8; }
+.trade-partners select, .trade-asset-row select { width: 100%; min-height: 38px; padding: 8px 9px; border: 1px solid #54749b; background: #071a33; color: #fff; font: 11px var(--body); }
+.trade-team-sections { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+.trade-team-section { min-width: 0; padding: 15px; border: 1px solid #31527a; background: #103261; }
+.trade-team-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 7px; margin-bottom: 12px; }
+.trade-team-heading h4 { margin: 0; color: #fff; font-size: 15px; }
+.trade-team-heading > span { color: #c5d5e8; font-size: 9px; }
+.trade-asset-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 32px; align-items: center; gap: 7px; margin-top: 8px; }
+.trade-asset-row .row-delete { min-height: 34px; }
+.trade-add-asset { margin-top: 10px; }
+.trade-impact { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; margin-top: 20px; }
+.trade-impact > h4 { grid-column: 1 / -1; margin: 0; color: #fff; font: 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+.trade-impact-card { padding: 13px; border: 1px solid #31527a; background: #0c2b50; }
+.trade-impact-card h5 { margin: 0 0 10px; color: #fff; font-size: 13px; }
+.trade-impact-card dl { display: grid; gap: 6px; margin: 0; }
+.trade-impact-card dl > div { display: flex; justify-content: space-between; gap: 10px; }
+.trade-impact-card dt { color: #c5d5e8; font-size: 10px; }
+.trade-impact-card dd { margin: 0; color: #fff; font: 10px var(--mono); text-align: right; }
+.trade-impact-card dd.is-positive-savings { color: #75e28b; }
+.trade-impact-card dd.is-negative-savings { color: #ff9299; }
+.trade-projected-room { margin: 12px 0 0; padding-top: 9px; border-top: 1px solid #31527a; color: #fff; font-size: 10px; font-weight: 700; }
+.trade-validation { margin: 10px 0 0; color: #ffb3a5; font-size: 10px; }
+.trade-execute { margin-top: 14px; }
+.trade-execute:disabled { cursor: not-allowed; opacity: .5; }
+
+@media (max-width: 1000px) {
+  .trade-asset-row { grid-template-columns: minmax(0, 1fr) 32px; }
+  .trade-asset-row [data-trade-destination] { grid-column: 1; grid-row: 2; }
+  .trade-asset-row .row-delete { grid-column: 2; grid-row: 1 / 3; }
+}
+
+@media (max-width: 700px) {
+  .trade-partners { grid-template-columns: 1fr; }
 }

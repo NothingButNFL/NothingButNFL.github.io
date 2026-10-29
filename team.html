@@ -30,7 +30,14 @@
           </button>
           <div class="teams-dropdown" id="teams-dropdown" aria-label="NFL team salary sheets"></div>
         </div>
-        <a href="admin.html"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span></a>
+        <div class="admin-menu">
+          <button class="admin-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-dropdown">
+            <span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span><span class="admin-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="admin-dropdown" id="admin-dropdown" aria-label="Admin pages">
+            <a class="admin-menu-link" href="admin.html" role="menuitem"><span>League Cap Directory</span></a>
+          </div>
+        </div>
         <a href="index.html#join" class="nav-cta"><span class="nav-icon" aria-hidden="true">＋</span><span class="nav-label">Get involved</span></a>
       </nav>
     </header>
@@ -79,7 +86,7 @@
           <p class="storage-notice" id="storage-notice" role="status">Edits are saved in this browser only. This workspace has no league sync or live NFL data.</p>
           <p class="workspace-status" id="workspace-status" role="status" aria-live="polite"></p>
 
-          <div class="season-tabs" id="season-tabs" role="tablist" aria-label="Contract season"></div>
+          <div class="season-tabs" id="season-tabs" role="tablist" aria-label="Team front-office sections"></div>
           <div id="salary-year-content">
           <div class="cap-overview" aria-label="Selected team season salary overview">
             <article class="cap-stat"><span>DEAD CAP · <span id="dead-cap-card-year">2026</span></span><strong id="dead-cap-card-total">$0</strong><small>Recorded for this salary year</small></article>
@@ -180,6 +187,21 @@
               <label>Original franchise<select name="originalTeam" required></select></label>
               <button class="button button-lime add-button" type="submit">Add owned pick <span aria-hidden="true">+</span></button>
             </form>
+          </div>
+          <div class="management-panel trade-panel" id="trade-panel" role="tabpanel" aria-labelledby="season-tab-trade" hidden>
+            <div class="panel-heading">
+              <div><span class="panel-index">04 / TRADE DESK</span><h3>Build a trade</h3></div>
+              <p>Choose up to two partner teams, assign players or picks to each destination, review each team's cap impact, and execute the trade.</p>
+            </div>
+            <div class="trade-partners">
+              <label>Trade partner 1<select id="trade-partner-one" aria-label="First trade partner"></select></label>
+              <label>Trade partner 2 <span>(optional)</span><select id="trade-partner-two" aria-label="Second trade partner"></select></label>
+            </div>
+            <div class="trade-team-sections" id="trade-team-sections"></div>
+            <p class="empty-state" id="trade-empty">Select at least one partner team and add the assets each team will send.</p>
+            <div class="trade-impact" id="trade-impact" aria-live="polite"></div>
+            <p class="trade-validation" id="trade-validation" role="status" aria-live="polite"></p>
+            <button class="button button-lime trade-execute" id="execute-trade" type="button" disabled>Execute trade</button>
           </div>
           <p class="workspace-footnote">Cap and pick records start blank. Enter your league's figures; no salaries, cap limits, or NFL transactions are preloaded as official data.</p>
         </div>

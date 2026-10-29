@@ -30,7 +30,14 @@
           </button>
           <div class="teams-dropdown" id="teams-dropdown" aria-label="NFL team salary sheets"></div>
         </div>
-        <a href="admin.html"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span></a>
+        <div class="admin-menu">
+          <button class="admin-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-dropdown">
+            <span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span><span class="admin-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="admin-dropdown" id="admin-dropdown" aria-label="Admin pages">
+            <a class="admin-menu-link" href="admin.html" role="menuitem"><span>League Cap Directory</span></a>
+          </div>
+        </div>
         <a href="#join" class="nav-cta"><span class="nav-icon" aria-hidden="true">＋</span><span class="nav-label">Get involved</span></a>
       </nav>
     </header>
