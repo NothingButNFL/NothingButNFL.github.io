@@ -18,6 +18,9 @@ let activeSeason = firstSeason;
 let activeTab = "salary";
 let officeData = emptyOfficeData();
 let storageIsAvailable = true;
+let tradePartnerIds = ["", ""];
+let tradeLines = {};
+let tradeLineCounter = 0;
 
 const originalTeamPicker = document.querySelector("#add-pick-form [name='originalTeam']");
 for (const team of nflTeams) originalTeamPicker.add(new Option(`${team.name} (${team.id})`, team.id));
@@ -391,6 +394,7 @@ function formatCurrency(value) {
 }
 
 function formatSignedCurrency(value) {
+  if (value === 0) return formatCurrency(0);
   return value > 0 ? `+${formatCurrency(value)}` : formatCurrency(value);
 }
 
@@ -494,6 +498,9 @@ function renderSeasonTabs() {
   const tabItems = [...seasons.map((year) => ({ id: String(year), label: String(year) })), {
     id: "draft-picks",
     label: "DRAFT PICKS"
+  }, {
+    id: "trade",
+    label: "TRADE"
   }];
   for (const { id, label } of tabItems) {
     const tab = document.createElement("button");
@@ -501,13 +508,16 @@ function renderSeasonTabs() {
     tab.id = `season-tab-${id}`;
     tab.className = "season-tab";
     tab.setAttribute("role", "tab");
-    const active = activeTab === "draft-picks" ? id === "draft-picks" : Number(id) === activeSeason;
+    const active = seasons.some((year) => String(year) === id)
+      ? activeTab === "salary" && Number(id) === activeSeason
+      : activeTab === id;
     tab.setAttribute("aria-selected", String(active));
-    tab.setAttribute("aria-controls", id === "draft-picks" ? "draft-picks-panel" : "salary-year-content");
+    tab.setAttribute("aria-controls", id === "draft-picks" ? "draft-picks-panel" :
+      id === "trade" ? "trade-panel" : "salary-year-content");
     tab.tabIndex = active ? 0 : -1;
     tab.textContent = label;
     tab.addEventListener("click", () => {
-      activeTab = id === "draft-picks" ? "draft-picks" : "salary";
+      activeTab = id === "draft-picks" || id === "trade" ? id : "salary";
       if (activeTab === "salary") activeSeason = Number(id);
       renderFrontOffice();
     });
@@ -515,9 +525,9 @@ function renderSeasonTabs() {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
       event.preventDefault();
       const direction = event.key === "ArrowRight" ? 1 : -1;
-      const currentIndex = tabItems.findIndex((item) => item.id === (activeTab === "draft-picks" ? "draft-picks" : String(activeSeason)));
+      const currentIndex = tabItems.findIndex((item) => item.id === (activeTab === "salary" ? String(activeSeason) : activeTab));
       const nextTab = tabItems[(currentIndex + direction + tabItems.length) % tabItems.length];
-      activeTab = nextTab.id === "draft-picks" ? "draft-picks" : "salary";
+      activeTab = seasons.some((year) => String(year) === nextTab.id) ? "salary" : nextTab.id;
       if (activeTab === "salary") activeSeason = Number(nextTab.id);
       renderFrontOffice();
       document.querySelector(`#season-tab-${nextTab.id}`).focus();
@@ -527,8 +537,9 @@ function renderSeasonTabs() {
 }
 
 function updateCapOverview() {
-  document.querySelector("#salary-year-content").hidden = activeTab === "draft-picks";
+  document.querySelector("#salary-year-content").hidden = activeTab !== "salary";
   document.querySelector("#draft-picks-panel").hidden = activeTab !== "draft-picks";
+  document.querySelector("#trade-panel").hidden = activeTab !== "trade";
   const team = selectedTeamData();
   const figures = seasonCapFigures(activeTeamId, activeSeason);
   document.querySelector("#dead-cap-card-total").textContent = formatCurrency(figures.deadCap);
@@ -551,9 +562,9 @@ function updateCapOverview() {
   document.querySelector("#salary-import-button-season").textContent = String(activeSeason);
   document.querySelector("#salary-panel-index").textContent = `${String(activeSeason - firstSeason + 1).padStart(2, "0")} / CONTRACTS`;
   document.querySelectorAll(".season-tab").forEach((tab) => {
-    const active = activeTab === "draft-picks"
-      ? tab.id === "season-tab-draft-picks"
-      : Number(tab.textContent) === activeSeason;
+    const active = activeTab === "salary"
+      ? Number(tab.textContent) === activeSeason
+      : tab.id === `season-tab-${activeTab}`;
     tab.classList.toggle("is-active", active);
     tab.setAttribute("aria-selected", String(active));
     tab.tabIndex = active ? 0 : -1;
@@ -863,6 +874,220 @@ function renderPickRows() {
   }
 }
 
+function tradeParticipants() {
+    return [activeTeamId, ...tradePartnerIds.filter((id) => nflTeams.some((team) => team.id === id) && id !== activeTeamId)]
+      .filter((id, index, ids) => ids.indexOf(id) === index)
+      .slice(0, 3);
+  }
+
+function tradeAssetLabel(assetKey, teamId, year) {
+    const [kind, id] = assetKey.split(":");
+    if (kind === "player") {
+      const player = officeData.teams[teamId].roster.find((item) => item.id === id);
+      if (!player || !isPlayerOnSeason(player, year)) return null;
+      const entry = seasonEntry(player, year);
+      return `Player · ${player.name} (${entry.position || "—"}) · ${formatCurrency(capHitFor(entry))}`;
+    }
+    if (kind === "pick") {
+      const pick = officeData.picks.find((item) => item.id === id);
+      if (!pick || pick.currentOwner !== teamId) return null;
+      const originalTeam = nflTeams.find(({ id: teamIdForName }) => teamIdForName === pick.originalTeam);
+      return `Pick · ${pick.year} Round ${pick.round} · ${originalTeam?.id || pick.originalTeam}`;
+    }
+    return null;
+  }
+
+function readTradeLines() {
+    for (const section of document.querySelectorAll(".trade-team-section")) {
+      tradeLines[section.dataset.teamId] = [...section.querySelectorAll(".trade-asset-row")].map((row) => ({
+        id: row.dataset.lineId,
+        assetKey: row.querySelector("[data-trade-asset]").value,
+        destinationId: row.querySelector("[data-trade-destination]").value
+      }));
+    }
+  }
+
+function tradeSelect(options, label, dataAttribute) {
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", label);
+    select.dataset[dataAttribute] = "true";
+    for (const [value, text] of options) select.add(new Option(text, value));
+    return select;
+  }
+
+function renderTradePanel() {
+    const participants = tradeParticipants();
+    const partnerSelects = [
+      document.querySelector("#trade-partner-one"),
+      document.querySelector("#trade-partner-two")
+    ];
+    for (const [index, select] of partnerSelects.entries()) {
+      const selected = tradePartnerIds[index];
+      select.replaceChildren(new Option(index === 0 ? "Choose a team" : "No second partner", ""));
+      for (const team of nflTeams) {
+        if (team.id === activeTeamId) continue;
+        const option = new Option(`${team.name} (${team.id})`, team.id);
+        if ((index === 0 && team.id === tradePartnerIds[1]) ||
+            (index === 1 && team.id === tradePartnerIds[0])) option.disabled = true;
+        select.add(option);
+      }
+      select.value = selected;
+    }
+
+    const sections = document.querySelector("#trade-team-sections");
+    sections.replaceChildren();
+    const year = currentLeagueYear();
+    for (const teamId of participants) {
+      const team = nflTeams.find(({ id }) => id === teamId);
+      const section = document.createElement("section");
+      section.className = "trade-team-section";
+      section.dataset.teamId = teamId;
+      const heading = document.createElement("div");
+      heading.className = "trade-team-heading";
+      const title = document.createElement("h4");
+      title.textContent = `${team.name} (${team.id}) sends`;
+      const helper = document.createElement("span");
+      helper.textContent = "Players and picks owned by this team";
+      heading.append(title, helper);
+      section.append(heading);
+
+      const lines = tradeLines[teamId] || [];
+      for (const line of lines) {
+        const row = document.createElement("div");
+        row.className = "trade-asset-row";
+        row.dataset.lineId = line.id;
+        const availableAssets = [
+          ...officeData.teams[teamId].roster
+            .filter((player) => isPlayerOnSeason(player, year))
+            .map((player) => [`player:${player.id}`, tradeAssetLabel(`player:${player.id}`, teamId, year)]),
+          ...officeData.picks
+            .filter((pick) => pick.currentOwner === teamId)
+            .map((pick) => [`pick:${pick.id}`, tradeAssetLabel(`pick:${pick.id}`, teamId, year)])
+        ].filter(([, label]) => label);
+        const assetOptions = [["", "Choose a player or draft pick"], ...availableAssets];
+        const assetSelect = tradeSelect(assetOptions, `Asset sent by ${team.name}`, "tradeAsset");
+        assetSelect.value = line.assetKey;
+        if (line.assetKey && !assetOptions.some(([value]) => value === line.assetKey)) assetSelect.value = "";
+        const destinationOptions = participants.filter((id) => id !== teamId)
+          .map((id) => [id, `${nflTeams.find(({ id: teamIdForName }) => teamIdForName === id).name} (${id})`]);
+        const destinationSelect = tradeSelect(destinationOptions, `Destination for asset from ${team.name}`, "tradeDestination");
+        destinationSelect.value = line.destinationId;
+        if (!destinationOptions.some(([value]) => value === line.destinationId)) {
+          destinationSelect.value = destinationOptions[0]?.[0] || "";
+        }
+        const remove = deleteButton(`Remove trade asset from ${team.name}`);
+        row.append(assetSelect, destinationSelect, remove);
+        section.append(row);
+      }
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.className = "workspace-button trade-add-asset";
+      addButton.dataset.teamId = teamId;
+      addButton.textContent = "＋ Add asset";
+      section.append(addButton);
+      sections.append(section);
+    }
+    document.querySelector("#trade-empty").hidden = participants.length > 1;
+    updateTradeSummary();
+  }
+
+function tradeAssetEntries() {
+    return Object.entries(tradeLines).flatMap(([fromTeamId, lines]) =>
+      lines.map((line) => ({ ...line, fromTeamId }))
+    );
+  }
+
+function calculateTradeImpacts(lines = tradeAssetEntries(), participants = tradeParticipants()) {
+    const year = currentLeagueYear();
+    const impacts = Object.fromEntries(participants.map((teamId) => [teamId, {
+      incoming: 0,
+      outgoing: 0,
+      deadCap: 0,
+      net: 0,
+      remaining: seasonCapFigures(teamId, year).remaining
+    }]));
+    for (const line of lines) {
+      if (!line.assetKey || !impacts[line.fromTeamId] || !impacts[line.destinationId]) continue;
+      const [kind, id] = line.assetKey.split(":");
+      if (kind !== "player") continue;
+      const player = officeData.teams[line.fromTeamId].roster.find((item) => item.id === id);
+      if (!player || !isPlayerOnSeason(player, year)) continue;
+      const capHit = capHitFor(seasonEntry(player, year));
+      const penalty = calculatedPenaltiesFor(player, year)?.tradePenalty || 0;
+      impacts[line.fromTeamId].outgoing += capHit;
+      impacts[line.fromTeamId].deadCap += penalty;
+      impacts[line.destinationId].incoming += capHit;
+    }
+    for (const impact of Object.values(impacts)) {
+      impact.net = impact.outgoing - impact.deadCap - impact.incoming;
+    }
+    return impacts;
+  }
+
+function updateTradeSummary() {
+    const impactContainer = document.querySelector("#trade-impact");
+    impactContainer.replaceChildren();
+    const participants = tradeParticipants();
+    const lines = tradeAssetEntries();
+    const validLines = lines.filter((line) => line.assetKey && line.destinationId);
+    const impacts = calculateTradeImpacts(validLines, participants);
+    const year = currentLeagueYear();
+    const heading = document.createElement("h4");
+    heading.textContent = `${year} cap-space impact`;
+    impactContainer.append(heading);
+    for (const teamId of participants) {
+      const team = nflTeams.find(({ id }) => id === teamId);
+      const impact = impacts[teamId];
+      const card = document.createElement("article");
+      card.className = "trade-impact-card";
+      const title = document.createElement("h5");
+      title.textContent = `${team.name} (${team.id})`;
+      const details = document.createElement("dl");
+      for (const [label, value] of [
+        ["Incoming cap (reduces room)", -impact.incoming],
+        ["Outgoing cap (frees room)", impact.outgoing],
+        ["Trade dead cap", -impact.deadCap],
+        ["Net cap-space change", impact.net]
+      ]) {
+        const row = document.createElement("div");
+        const term = document.createElement("dt");
+        term.textContent = label;
+        const amount = document.createElement("dd");
+        amount.textContent = formatSignedCurrency(value);
+        if (label === "Net cap-space change") amount.className = value > 0 ? "is-positive-savings" : value < 0 ? "is-negative-savings" : "";
+        row.append(term, amount);
+        details.append(row);
+      }
+      const remaining = document.createElement("p");
+      remaining.className = "trade-projected-room";
+      remaining.textContent = impact.remaining === null
+        ? "Projected cap room: base cap not set"
+        : `Projected cap room: ${formatSignedCurrency(impact.remaining + impact.net)}`;
+      card.append(title, details, remaining);
+      impactContainer.append(card);
+    }
+    const duplicateAsset = new Set();
+    let hasDuplicate = false;
+    for (const line of validLines) {
+      const key = `${line.fromTeamId}:${line.assetKey}`;
+      if (duplicateAsset.has(key)) hasDuplicate = true;
+      duplicateAsset.add(key);
+    }
+    const execute = document.querySelector("#execute-trade");
+    const validation = document.querySelector("#trade-validation");
+    const invalid = validLines.length !== lines.length;
+    execute.disabled = participants.length < 2 || !validLines.length || invalid || hasDuplicate || lines.length > 100;
+    validation.textContent = participants.length < 2
+      ? "Choose at least one partner team to start a trade."
+      : lines.length > 100
+        ? "A trade can include up to 100 assets."
+        : hasDuplicate
+          ? "Each player or draft pick can only appear once in a trade."
+          : invalid
+            ? "Choose an asset and destination for every trade row."
+            : "";
+}
+
 function renderDeadCapRows() {
   const year = activeSeason;
   const records = deadCapSeasons.includes(year) ? selectedTeamData().deadCap[year] : [];
@@ -978,7 +1203,168 @@ function renderFrontOffice() {
   renderDeadCapRows();
   renderPickRows();
   updateCapOverview();
+  renderTradePanel();
 }
+
+function addTradeAssetRow(teamId) {
+  readTradeLines();
+  const participants = tradeParticipants();
+  const destinationId = participants.find((id) => id !== teamId) || "";
+  tradeLines[teamId] ||= [];
+  tradeLines[teamId].push({
+    id: `trade-line-${++tradeLineCounter}`,
+    assetKey: "",
+    destinationId
+  });
+  renderTradePanel();
+  document.querySelector(`#trade-team-sections [data-team-id="${teamId}"] .trade-asset-row:last-of-type [data-trade-asset]`)?.focus();
+}
+
+function executeTrade() {
+  readTradeLines();
+  const participants = tradeParticipants();
+  const lines = tradeAssetEntries();
+  const year = currentLeagueYear();
+  if (participants.length < 2 || participants.length > 3 || !lines.length || lines.length > 100) {
+    workspaceStatus.textContent = "Choose one or two partner teams and add between 1 and 100 trade assets.";
+    return;
+  }
+  const seenAssets = new Set();
+  const assets = [];
+  const incomingPlayers = Object.fromEntries(participants.map((id) => [id, 0]));
+  const deadCapAdds = Object.fromEntries(participants.map((id) => [id, { current: 0, next: 0 }]));
+  for (const line of lines) {
+    if (!line.assetKey || !participants.includes(line.fromTeamId) ||
+        !participants.includes(line.destinationId) || line.fromTeamId === line.destinationId) {
+      workspaceStatus.textContent = "Each trade item needs a valid asset and a different destination team. No changes were made.";
+      return;
+    }
+    const key = `${line.fromTeamId}:${line.assetKey}`;
+    if (seenAssets.has(key)) {
+      workspaceStatus.textContent = "An asset can only be included once in a trade. No changes were made.";
+      return;
+    }
+    seenAssets.add(key);
+    const [kind, id] = line.assetKey.split(":");
+    if (kind === "player") {
+      const source = officeData.teams[line.fromTeamId];
+      const player = source.roster.find((item) => item.id === id);
+      if (!player || !isPlayerOnSeason(player, year)) {
+        workspaceStatus.textContent = "A selected player is no longer on the sending team's current-year salary sheet. No changes were made.";
+        return;
+      }
+      const penalties = calculatedPenaltiesFor(player, year);
+      if (!penalties) {
+        workspaceStatus.textContent = `Could not calculate trade dead cap for ${player.name}. No changes were made.`;
+        return;
+      }
+      incomingPlayers[line.destinationId] += 1;
+      deadCapAdds[line.fromTeamId].current += 1;
+      if (penalties.futureTradeDeadCap > 0 && deadCapSeasons.includes(year + 1)) {
+        deadCapAdds[line.fromTeamId].next += 1;
+      }
+      assets.push({ ...line, kind, id, player, penalties });
+    } else if (kind === "pick") {
+      const pick = officeData.picks.find((item) => item.id === id && item.currentOwner === line.fromTeamId);
+      if (!pick) {
+        workspaceStatus.textContent = "A selected draft pick is no longer owned by the sending team. No changes were made.";
+        return;
+      }
+      assets.push({ ...line, kind, id, pick });
+    } else {
+      workspaceStatus.textContent = "A selected trade asset is invalid. No changes were made.";
+      return;
+    }
+  }
+  if (participants.some((id) => officeData.teams[id].roster.length + incomingPlayers[id] > 5000)) {
+    workspaceStatus.textContent = "This trade would exceed a team's 5,000-player roster limit. No changes were made.";
+    return;
+  }
+  if (participants.some((id) =>
+    officeData.teams[id].deadCap[year].length + deadCapAdds[id].current > 5000 ||
+    (seasons.includes(year + 1) && officeData.teams[id].deadCap[year + 1].length + deadCapAdds[id].next > 5000)
+  )) {
+    workspaceStatus.textContent = "This trade would exceed a team's 5,000-entry dead-cap limit. No changes were made.";
+    return;
+  }
+
+  const impacts = calculateTradeImpacts(lines, participants);
+  const impactSummary = participants.map((id) => {
+    const team = nflTeams.find(({ id: teamId }) => teamId === id);
+    return `${team.name}: ${formatSignedCurrency(impacts[id].net)} cap-space change`;
+  }).join("\n");
+  if (!window.confirm(`Execute this ${assets.length}-asset trade for ${year}?\n\n${impactSummary}\n\nPlayer contracts and pick ownership will move between teams. This cannot be undone except by editing the team sheets or importing a backup.`)) return;
+
+  const date = new Date().toISOString();
+  for (const asset of assets) {
+    const sourceTeam = officeData.teams[asset.fromTeamId];
+    const destinationTeam = officeData.teams[asset.destinationId];
+    if (asset.kind === "pick") {
+      asset.pick.currentOwner = asset.destinationId;
+      continue;
+    }
+    sourceTeam.roster = sourceTeam.roster.filter(({ id }) => id !== asset.id);
+    destinationTeam.roster.push(asset.player);
+    const record = (amount) => ({
+      id: globalThis.crypto?.randomUUID?.() || `dead-cap-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      playerName: asset.player.name,
+      position: seasonEntry(asset.player, year).position,
+      transaction: "trade",
+      transactionYear: year,
+      amount,
+      date
+    });
+    sourceTeam.deadCap[year].push(record(asset.penalties.tradePenalty));
+    if (asset.penalties.futureTradeDeadCap > 0 && deadCapSeasons.includes(year + 1)) {
+      sourceTeam.deadCap[year + 1].push(record(asset.penalties.futureTradeDeadCap));
+    }
+  }
+  tradeLines = Object.fromEntries(participants.map((id) => [id, []]));
+  renderFrontOffice();
+  saveOfficeData(`Trade executed among ${participants.map((id) => nflTeams.find(({ id: teamId }) => teamId === id).name).join(", ")}. Player contracts, picks, and cap ledgers were updated.`);
+}
+
+document.querySelector("#trade-partner-one").addEventListener("change", (event) => {
+  readTradeLines();
+  tradePartnerIds[0] = event.currentTarget.value;
+  if (tradePartnerIds[0] && tradePartnerIds[0] === tradePartnerIds[1]) tradePartnerIds[1] = "";
+  const activeParticipants = tradeParticipants();
+  tradeLines = Object.fromEntries(Object.entries(tradeLines).filter(([teamId]) => activeParticipants.includes(teamId)));
+  renderTradePanel();
+});
+
+document.querySelector("#trade-partner-two").addEventListener("change", (event) => {
+  readTradeLines();
+  tradePartnerIds[1] = event.currentTarget.value;
+  if (tradePartnerIds[1] && tradePartnerIds[1] === tradePartnerIds[0]) tradePartnerIds[1] = "";
+  const activeParticipants = tradeParticipants();
+  tradeLines = Object.fromEntries(Object.entries(tradeLines).filter(([teamId]) => activeParticipants.includes(teamId)));
+  renderTradePanel();
+});
+
+document.querySelector("#trade-team-sections").addEventListener("change", (event) => {
+  if (!event.target.matches("[data-trade-asset], [data-trade-destination]")) return;
+  readTradeLines();
+  updateTradeSummary();
+});
+
+document.querySelector("#trade-team-sections").addEventListener("click", (event) => {
+  const addButton = event.target.closest(".trade-add-asset");
+  if (addButton) {
+    addTradeAssetRow(addButton.dataset.teamId);
+    return;
+  }
+  const removeButton = event.target.closest(".row-delete");
+  const row = removeButton?.closest(".trade-asset-row");
+  if (!row) return;
+  readTradeLines();
+  const section = row.closest(".trade-team-section");
+  tradeLines[section.dataset.teamId] = tradeLines[section.dataset.teamId]
+    .filter((line) => line.id !== row.dataset.lineId);
+  renderTradePanel();
+});
+
+document.querySelector("#execute-trade").addEventListener("click", executeTrade);
 
 document.querySelector("#import-dead-cap-paste").addEventListener("click", importDeadCapPaste);
 
@@ -1049,6 +1435,7 @@ document.querySelector("#cap-adjustment").addEventListener("change", (event) => 
   input.value = formatCurrency(value);
   updateCapOverview();
   updateComputedCells();
+  updateTradeSummary();
   saveOfficeData(`${currentTeam.name} ${activeSeason} manual cap adjustment updated.`);
 });
 
@@ -1116,6 +1503,7 @@ salaryRows.addEventListener("change", (event) => {
   }
   updateCapOverview();
   updateComputedCells();
+  updateTradeSummary();
   saveOfficeData(`${player.name}'s ${field} updated for ${activeSeason}.`);
 });
 
@@ -1189,6 +1577,7 @@ document.querySelector("#add-pick-form").addEventListener("submit", (event) => {
   form.elements.round.value = "";
   form.elements.originalTeam.value = activeTeamId;
   renderPickRows();
+  renderTradePanel();
   saveOfficeData(`${pick.year} round ${pick.round} pick from ${nflTeams.find(({ id }) => id === pick.originalTeam).name} added to ${currentTeam.name}.`);
 });
 
@@ -1225,6 +1614,7 @@ picksRows.addEventListener("change", (event) => {
     ? `${pick.year} round ${pick.round} pick moved to ${ownerName}.`
     : `${pick.year} round ${pick.round} pick updated.`);
   if (field === "currentOwner" && pick.currentOwner !== activeTeamId) renderPickRows();
+  renderTradePanel();
 });
 
 picksRows.addEventListener("click", (event) => {
@@ -1233,6 +1623,7 @@ picksRows.addEventListener("click", (event) => {
   if (!row) return;
   officeData.picks = officeData.picks.filter(({ id }) => id !== row.dataset.pickId);
   renderPickRows();
+  renderTradePanel();
   saveOfficeData("Draft pick removed from the ledger.");
 });
 

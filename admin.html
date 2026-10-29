@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#071a33">
     <meta name="description" content="Manage Nothing But NFL league-wide salary cap settings.">
-    <title>League Admin — Nothing But NFL</title>
+    <title>League Cap Directory — Nothing But NFL</title>
     <link rel="icon" href="assets/nothing-but-nfl-logo.png" type="image/png">
     <link rel="stylesheet" href="styles.css">
     <script src="teams.js" defer></script>
@@ -30,7 +30,14 @@
           </button>
           <div class="teams-dropdown" id="teams-dropdown" aria-label="NFL team salary sheets"></div>
         </div>
-        <a href="admin.html" aria-current="page"><span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span></a>
+        <div class="admin-menu">
+          <button class="admin-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="admin-dropdown">
+            <span class="nav-icon" aria-hidden="true">⚙</span><span class="nav-label">Admin</span><span class="admin-chevron" aria-hidden="true">›</span>
+          </button>
+          <div class="admin-dropdown" id="admin-dropdown" aria-label="Admin pages">
+            <a class="admin-menu-link" href="admin.html" role="menuitem" aria-current="page"><span>League Cap Directory</span></a>
+          </div>
+        </div>
         <a href="index.html#join" class="nav-cta"><span class="nav-icon" aria-hidden="true">＋</span><span class="nav-label">Get involved</span></a>
       </nav>
     </header>
@@ -42,7 +49,7 @@
           <div class="team-page-title">
             <div>
               <p class="eyebrow"><span class="eyebrow-dot"></span> LEAGUE-WIDE SETTINGS</p>
-              <h1>Admin</h1>
+              <h1>League Cap Directory</h1>
               <p class="team-page-subtitle">Set the shared base salary cap for each contract season.</p>
             </div>
           </div>
@@ -54,7 +61,7 @@
           <div class="section-heading-row front-office-heading">
             <div>
               <div class="section-kicker"><span>01</span> COMMISSIONER SETTINGS</div>
-              <h2 id="admin-title">League cap <span>directory.</span></h2>
+              <h2 id="admin-title">League cap <span>settings.</span></h2>
               <p class="section-subtitle">These base caps are shared across all 32 team sheets. Changes are saved in this browser and reflected on each team's cap overview.</p>
             </div>
             <span class="data-mode"><i aria-hidden="true"></i> LOCAL TO THIS BROWSER</span>
